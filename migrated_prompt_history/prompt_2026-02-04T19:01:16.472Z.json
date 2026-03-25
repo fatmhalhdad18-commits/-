@@ -1,0 +1,269 @@
+[
+  {
+    "id": 11,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "I want a project for mothers where we determine the child's age and the problem they have. Then you tell me how to deal with it and the treatment methods.",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1770231543,
+      "nanos": 969000000
+    }
+  },
+  {
+    "id": 12,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": "**Defining App Parameters**\n\nI'm now focusing on defining the React application's parameters. I envision a web app designed for mothers to input their child's age and a specific concern (behavioral, health, etc.). My immediate goal is to craft an app that offers tailored advice and resource suggestions based on the provided data.\n\n\n**Outlining API Integration**\n\nI'm now detailing the treatment methods through the Gemini API. The plan is to have inputs for the child's age, and concerns, integrating Gemini 3 Flash for quick advice. Visually, the UI will be clean and reassuring. The output will be structured advice. I'm using React, TypeScript, Tailwind CSS, and the Gemini API. I have also been outlining the file structure and defining the structure for the prompt.\n\n\n",
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1770231543,
+      "nanos": 969000000
+    },
+    "doneTimestamp": {
+      "seconds": 1770231548,
+      "nanos": 901000000
+    }
+  },
+  {
+    "id": 13,
+    "author": "model",
+    "payload": {
+      "type": "generationTable",
+      "entries": [
+        {
+          "path": "metadata.json",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Project configuration and permissions.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\n{\n  \"name\": \"MomHelper - Child Care Guide\",\n  \"description\": \"An AI-powered assistant for mothers to get tailored advice on child health, behavior, and developmental concerns based on age-specific needs.\"\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "index.html",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Main HTML entry point with Tailwind CSS and Font support.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>MomHelper - AI Child Care Guide</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <style>\n        body {\n            font-family: 'Inter', sans-serif;\n        }\n        h1, h2, h3, .font-brand {\n            font-family: 'Quicksand', sans-serif;\n        }\n    </style>\n</head>\n<body class=\"bg-slate-50 text-slate-900\">\n    <div id=\"root\"></div>\n</body>\n</html>\n"
+            }
+          ]
+        },
+        {
+          "path": "index.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "React application entry point.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\nimport ReactDOM from 'react-dom/client';\nimport App from './App';\n\nconst rootElement = document.getElementById('root');\nif (!rootElement) {\n  throw new Error(\"Could not find root element to mount to\");\n}\n\nconst root = ReactDOM.createRoot(rootElement);\nroot.render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>\n);\n"
+            }
+          ]
+        },
+        {
+          "path": "types.ts",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Shared TypeScript interfaces and enums.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nexport interface ChildAdvice {\n  summary: string;\n  immediateSteps: string[];\n  managementStrategies: string[];\n  expertTips: string[];\n  warningSigns: string[];\n}\n\nexport interface ConsultationData {\n  age: string;\n  ageUnit: 'days' | 'months' | 'years';\n  problem: string;\n}\n\nexport enum LoadingState {\n  IDLE = 'IDLE',\n  LOADING = 'LOADING',\n  SUCCESS = 'SUCCESS',\n  ERROR = 'ERROR'\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "services/geminiService.ts",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Service logic for Gemini API integration.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport { GoogleGenAI, Type } from \"@google/genai\";\nimport { ChildAdvice, ConsultationData } from \"../types\";\n\nexport const getChildAdvice = async (data: ConsultationData): Promise<ChildAdvice> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });\n  \n  const prompt = `Act as an expert pediatrician and child developmental psychologist. \n  A mother is asking for advice. \n  Child's Age: ${data.age} ${data.ageUnit}\n  Problem/Concern: ${data.problem}\n\n  Provide compassionate, evidence-based, and practical advice.\n  Ensure the tone is supportive and reassuring.`;\n\n  const response = await ai.models.generateContent({\n    model: 'gemini-3-flash-preview',\n    contents: prompt,\n    config: {\n      responseMimeType: \"application/json\",\n      responseSchema: {\n        type: Type.OBJECT,\n        properties: {\n          summary: {\n            type: Type.STRING,\n            description: \"A sympathetic overview of the situation.\"\n          },\n          immediateSteps: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"What to do right now.\"\n          },\n          managementStrategies: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"Long-term methods to deal with this.\"\n          },\n          expertTips: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"Professional insights for the mother.\"\n          },\n          warningSigns: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"Red flags indicating a doctor should be consulted.\"\n          }\n        },\n        required: [\"summary\", \"immediateSteps\", \"managementStrategies\", \"expertTips\", \"warningSigns\"]\n      }\n    }\n  });\n\n  const text = response.text;\n  if (!text) throw new Error(\"No advice generated\");\n  \n  return JSON.parse(text);\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "components/Layout.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Main layout wrapper with navigation and footer.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\n\nexport const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {\n  return (\n    <div className=\"min-h-screen flex flex-col\">\n      <header className=\"bg-white border-b border-slate-200 sticky top-0 z-50\">\n        <div className=\"max-w-4xl mx-auto px-4 h-16 flex items-center justify-between\">\n          <div className=\"flex items-center space-x-2\">\n            <div className=\"w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" className=\"h-5 w-5 text-white\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                <path fillRule=\"evenodd\" d=\"M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z\" clipRule=\"evenodd\" />\n              </svg>\n            </div>\n            <span className=\"text-xl font-bold font-brand tracking-tight text-rose-600\">MomHelper</span>\n          </div>\n          <nav className=\"hidden sm:flex items-center space-x-6\">\n            <a href=\"#\" className=\"text-sm font-medium text-slate-600 hover:text-rose-500 transition-colors\">Safety Tips</a>\n            <a href=\"#\" className=\"text-sm font-medium text-slate-600 hover:text-rose-500 transition-colors\">About Us</a>\n          </nav>\n        </div>\n      </header>\n\n      <main className=\"flex-grow\">\n        {children}\n      </main>\n\n      <footer className=\"bg-white border-t border-slate-200 py-8 mt-12\">\n        <div className=\"max-w-4xl mx-auto px-4 text-center\">\n          <p className=\"text-slate-500 text-sm\">\n            &copy; {new Date().getFullYear()} MomHelper. All rights reserved.\n          </p>\n          <p className=\"text-slate-400 text-xs mt-2\">\n            Disclaimer: This AI tool provides general guidance and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider.\n          </p>\n        </div>\n      </footer>\n    </div>\n  );\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "components/AdviceDisplay.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Component to visualize the AI-generated advice.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\nimport { ChildAdvice } from '../types';\n\ninterface AdviceDisplayProps {\n  advice: ChildAdvice;\n  onReset: () => void;\n}\n\nexport const AdviceDisplay: React.FC<AdviceDisplayProps> = ({ advice, onReset }) => {\n  return (\n    <div className=\"space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500\">\n      <div className=\"bg-rose-50 border border-rose-100 rounded-2xl p-6 sm:p-8\">\n        <h2 className=\"text-2xl font-bold font-brand text-rose-800 mb-4\">Advice for your little one</h2>\n        <p className=\"text-rose-900/80 leading-relaxed mb-6 italic\">\"{advice.summary}\"</p>\n        \n        <div className=\"grid grid-cols-1 md:grid-cols-2 gap-6\">\n          <section className=\"bg-white rounded-xl p-5 shadow-sm border border-rose-100\">\n            <h3 className=\"text-lg font-bold text-rose-700 flex items-center mb-3\">\n              <span className=\"bg-rose-100 p-1.5 rounded-lg mr-2\">🚀</span>\n              Immediate Steps\n            </h3>\n            <ul className=\"space-y-2\">\n              {advice.immediateSteps.map((step, i) => (\n                <li key={i} className=\"flex items-start text-slate-700 text-sm\">\n                  <span className=\"text-rose-400 mr-2\">•</span>\n                  {step}\n                </li>\n              ))}\n            </ul>\n          </section>\n\n          <section className=\"bg-white rounded-xl p-5 shadow-sm border border-rose-100\">\n            <h3 className=\"text-lg font-bold text-rose-700 flex items-center mb-3\">\n              <span className=\"bg-rose-100 p-1.5 rounded-lg mr-2\">🌱</span>\n              Management Strategies\n            </h3>\n            <ul className=\"space-y-2\">\n              {advice.managementStrategies.map((strategy, i) => (\n                <li key={i} className=\"flex items-start text-slate-700 text-sm\">\n                  <span className=\"text-rose-400 mr-2\">•</span>\n                  {strategy}\n                </li>\n              ))}\n            </ul>\n          </section>\n        </div>\n\n        <div className=\"mt-6 space-y-6\">\n          <section className=\"bg-indigo-50 rounded-xl p-5 border border-indigo-100\">\n            <h3 className=\"text-lg font-bold text-indigo-700 flex items-center mb-3\">\n              <span className=\"bg-indigo-100 p-1.5 rounded-lg mr-2\">💡</span>\n              Expert Tips\n            </h3>\n            <ul className=\"grid grid-cols-1 sm:grid-cols-2 gap-3\">\n              {advice.expertTips.map((tip, i) => (\n                <li key={i} className=\"flex items-center text-indigo-900 text-sm font-medium\">\n                  <svg className=\"w-4 h-4 mr-2 text-indigo-400 shrink-0\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n                    <path fillRule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z\" clipRule=\"evenodd\" />\n                  </svg>\n                  {tip}\n                </li>\n              ))}\n            </ul>\n          </section>\n\n          <section className=\"bg-amber-50 rounded-xl p-5 border border-amber-200\">\n            <h3 className=\"text-lg font-bold text-amber-700 flex items-center mb-3\">\n              <span className=\"bg-amber-100 p-1.5 rounded-lg mr-2\">⚠️</span>\n              When to See a Doctor\n            </h3>\n            <ul className=\"space-y-2\">\n              {advice.warningSigns.map((sign, i) => (\n                <li key={i} className=\"flex items-start text-amber-900 text-sm font-semibold\">\n                  <span className=\"text-amber-500 mr-2\">•</span>\n                  {sign}\n                </li>\n              ))}\n            </ul>\n          </section>\n        </div>\n\n        <button\n          onClick={onReset}\n          className=\"mt-8 w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-rose-200 hover:bg-rose-700 transition-all active:scale-95\"\n        >\n          Ask Another Question\n        </button>\n      </div>\n    </div>\n  );\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "App.tsx",
+          "generationType": 0,
+          "isDone": true,
+          "description": "Main application component with state management.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React, { useState } from 'react';\nimport { Layout } from './components/Layout';\nimport { AdviceDisplay } from './components/AdviceDisplay';\nimport { getChildAdvice } from './services/geminiService';\nimport { ChildAdvice, ConsultationData, LoadingState } from './types';\n\nexport default function App() {\n  const [formData, setFormData] = useState<ConsultationData>({\n    age: '',\n    ageUnit: 'years',\n    problem: ''\n  });\n  const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.IDLE);\n  const [advice, setAdvice] = useState<ChildAdvice | null>(null);\n  const [error, setError] = useState<string | null>(null);\n\n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault();\n    if (!formData.age || !formData.problem) return;\n\n    setLoadingState(LoadingState.LOADING);\n    setError(null);\n    \n    try {\n      const result = await getChildAdvice(formData);\n      setAdvice(result);\n      setLoadingState(LoadingState.SUCCESS);\n    } catch (err) {\n      console.error(err);\n      setError(\"I'm sorry, I couldn't process that. Please try again or rephrase your concern.\");\n      setLoadingState(LoadingState.ERROR);\n    }\n  };\n\n  const handleReset = () => {\n    setAdvice(null);\n    setLoadingState(LoadingState.IDLE);\n    setFormData({ age: '', ageUnit: 'years', problem: '' });\n  };\n\n  return (\n    <Layout>\n      <div className=\"max-w-4xl mx-auto px-4 py-8 sm:py-12\">\n        <div className=\"text-center mb-10\">\n          <h1 className=\"text-4xl font-extrabold text-slate-900 mb-4 font-brand\">How can we help you today?</h1>\n          <p className=\"text-lg text-slate-600 max-w-2xl mx-auto\">\n            Get personalized advice and treatment methods for your child's specific age and concerns.\n          </p>\n        </div>\n\n        {loadingState !== LoadingState.SUCCESS ? (\n          <div className=\"bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transition-all duration-300\">\n            <div className=\"p-6 sm:p-10\">\n              <form onSubmit={handleSubmit} className=\"space-y-6\">\n                <div className=\"grid grid-cols-1 sm:grid-cols-2 gap-6\">\n                  <div>\n                    <label className=\"block text-sm font-semibold text-slate-700 mb-2\">Child's Age</label>\n                    <div className=\"flex space-x-2\">\n                      <input\n                        type=\"number\"\n                        required\n                        min=\"0\"\n                        value={formData.age}\n                        onChange={(e) => setFormData(p => ({ ...p, age: e.target.value }))}\n                        className=\"flex-grow px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all outline-none\"\n                        placeholder=\"e.g. 3\"\n                      />\n                      <select\n                        value={formData.ageUnit}\n                        onChange={(e) => setFormData(p => ({ ...p, ageUnit: e.target.value as any }))}\n                        className=\"px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all outline-none bg-slate-50 font-medium\"\n                      >\n                        <option value=\"days\">Days</option>\n                        <option value=\"months\">Months</option>\n                        <option value=\"years\">Years</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div className=\"hidden sm:block\">\n                    <div className=\"h-full bg-rose-50 rounded-2xl flex items-center p-4 border border-rose-100\">\n                      <p className=\"text-xs text-rose-700\">\n                        Age-specific guidance is key because developmental milestones change rapidly in early childhood.\n                      </p>\n                    </div>\n                  </div>\n                </div>\n\n                <div>\n                  <label className=\"block text-sm font-semibold text-slate-700 mb-2\">What's the problem or concern?</label>\n                  <textarea\n                    required\n                    rows={4}\n                    value={formData.problem}\n                    onChange={(e) => setFormData(p => ({ ...p, problem: e.target.value }))}\n                    className=\"w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all outline-none resize-none\"\n                    placeholder=\"Describe symptoms, behavior, or any questions you have... (e.g., picky eating, fever, sleep habits)\"\n                  />\n                </div>\n\n                {error && (\n                  <div className=\"p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm font-medium\">\n                    {error}\n                  </div>\n                )}\n\n                <button\n                  type=\"submit\"\n                  disabled={loadingState === LoadingState.LOADING}\n                  className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center space-x-2\n                    ${loadingState === LoadingState.LOADING \n                      ? 'bg-slate-300 cursor-not-allowed' \n                      : 'bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] shadow-rose-200 hover:shadow-rose-300'\n                    }`}\n                >\n                  {loadingState === LoadingState.LOADING ? (\n                    <>\n                      <svg className=\"animate-spin h-5 w-5 mr-3\" viewBox=\"0 0 24 24\">\n                        <circle className=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"4\" fill=\"none\"></circle>\n                        <path className=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z\"></path>\n                      </svg>\n                      <span>Consulting Specialists...</span>\n                    </>\n                  ) : (\n                    <span>Get Expert Advice</span>\n                  )}\n                </button>\n              </form>\n            </div>\n          </div>\n        ) : (\n          advice && <AdviceDisplay advice={advice} onReset={handleReset} />\n        )}\n\n        <div className=\"mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8\">\n          <div className=\"text-center\">\n            <div className=\"w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-xl font-bold\">1</div>\n            <h4 className=\"font-bold text-slate-800 mb-1\">Enter Details</h4>\n            <p className=\"text-sm text-slate-500\">Provide age and details of the specific concern.</p>\n          </div>\n          <div className=\"text-center\">\n            <div className=\"w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 text-xl font-bold\">2</div>\n            <h4 className=\"font-bold text-slate-800 mb-1\">AI Analysis</h4>\n            <p className=\"text-sm text-slate-500\">Our model cross-references pediatric guidelines.</p>\n          </div>\n          <div className=\"text-center\">\n            <div className=\"w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600 text-xl font-bold\">3</div>\n            <h4 className=\"font-bold text-slate-800 mb-1\">Get Guidance</h4>\n            <p className=\"text-sm text-slate-500\">Receive actionable steps and management methods.</p>\n          </div>\n        </div>\n      </div>\n    </Layout>\n  );\n}\n"
+            }
+          ]
+        }
+      ]
+    },
+    "createdTimestamp": {
+      "seconds": 1770231548,
+      "nanos": 902000000
+    },
+    "doneTimestamp": {
+      "seconds": 1770231549,
+      "nanos": 620000000
+    }
+  },
+  {
+    "id": 15,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "It needs to be in Arabic.",
+      "files": [],
+      "fileUploads": [],
+      "cssBlocks": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1770231631,
+      "nanos": 858000000
+    }
+  },
+  {
+    "id": 16,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": "**Initiating Arabic Translation**\n\nOkay, I'm starting to formulate a plan to translate the application to Arabic. I'm focusing on key files: `metadata.json`, `index.html`, and `services/geminiService.ts`. I'll start by updating the metadata with Arabic names and descriptions. Then, I will move to `index.html` to adjust the language attribute and title. Finally, I will make sure the system prompt in `geminiService.ts` is adapted.\n\n\n",
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1770231631,
+      "nanos": 859000000
+    },
+    "doneTimestamp": {
+      "seconds": 1770231644,
+      "nanos": 385000000
+    }
+  },
+  {
+    "id": 17,
+    "author": "model",
+    "payload": {
+      "type": "generationTable",
+      "entries": [
+        {
+          "path": "index.html",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Update language to Arabic, add RTL support, and include an Arabic font (Cairo).",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\n<!DOCTYPE html>\n<html lang=\"ar\" dir=\"rtl\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>مساعد الأم - دليل ذكي لرعاية الطفل</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <link href=\"https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <style>\n        body {\n            font-family: 'Cairo', sans-serif;\n        }\n        .font-brand {\n            font-family: 'Cairo', sans-serif;\n        }\n    </style>\n<script type=\"importmap\">\n{\n  \"imports\": {\n    \"react\": \"https://esm.sh/react@^19.2.4\",\n    \"react-dom/\": \"https://esm.sh/react-dom@^19.2.4/\",\n    \"react/\": \"https://esm.sh/react@^19.2.4/\",\n    \"@google/genai\": \"https://esm.sh/@google/genai@^1.39.0\"\n  }\n}\n</script>\n</head>\n<body class=\"bg-slate-50 text-slate-900\">\n    <div id=\"root\"></div>\n</body>\n</html>\n"
+            }
+          ]
+        },
+        {
+          "path": "metadata.json",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Translate metadata to Arabic.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\n{\n  \"name\": \"مساعد الأم - دليل رعاية الطفل\",\n  \"description\": \"مساعد مدعوم بالذكاء الاصطناعي للأمهات للحصول على نصائح مخصصة حول صحة الطفل وسلوكه واحتياجاته التنموية بناءً على عمره.\",\n  \"requestFramePermissions\": []\n}\n"
+            }
+          ]
+        },
+        {
+          "path": "services/geminiService.ts",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Modify prompt to ensure response is in Arabic.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport { GoogleGenAI, Type } from \"@google/genai\";\nimport { ChildAdvice, ConsultationData } from \"../types\";\n\nexport const getChildAdvice = async (data: ConsultationData): Promise<ChildAdvice> => {\n  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });\n  \n  const prompt = `Act as an expert pediatrician and child developmental psychologist. \n  A mother is asking for advice in Arabic. \n  Child's Age: ${data.age} ${data.ageUnit}\n  Problem/Concern: ${data.problem}\n\n  Provide compassionate, evidence-based, and practical advice.\n  Ensure the tone is supportive and reassuring.\n  ALL response fields MUST be in Arabic language.`;\n\n  const response = await ai.models.generateContent({\n    model: 'gemini-3-flash-preview',\n    contents: prompt,\n    config: {\n      responseMimeType: \"application/json\",\n      responseSchema: {\n        type: Type.OBJECT,\n        properties: {\n          summary: {\n            type: Type.STRING,\n            description: \"A sympathetic overview of the situation in Arabic.\"\n          },\n          immediateSteps: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"What to do right now in Arabic.\"\n          },\n          managementStrategies: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"Long-term methods to deal with this in Arabic.\"\n          },\n          expertTips: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"Professional insights for the mother in Arabic.\"\n          },\n          warningSigns: {\n            type: Type.ARRAY,\n            items: { type: Type.STRING },\n            description: \"Red flags indicating a doctor should be consulted in Arabic.\"\n          }\n        },\n        required: [\"summary\", \"immediateSteps\", \"managementStrategies\", \"expertTips\", \"warningSigns\"]\n      }\n    }\n  });\n\n  const text = response.text;\n  if (!text) throw new Error(\"لم يتم إنشاء نصيحة\");\n  \n  return JSON.parse(text);\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "components/Layout.tsx",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Translate layout components and text to Arabic.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\n\nexport const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {\n  return (\n    <div className=\"min-h-screen flex flex-col\">\n      <header className=\"bg-white border-b border-slate-200 sticky top-0 z-50\">\n        <div className=\"max-w-4xl mx-auto px-4 h-16 flex items-center justify-between\">\n          <div className=\"flex items-center space-x-2 space-x-reverse\">\n            <div className=\"w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center\">\n              <svg xmlns=\"http://www.w3.org/2000/svg\" className=\"h-5 w-5 text-white\" viewBox=\"0 0 20 20\" fill=\"currentColor\">\n                <path fillRule=\"evenodd\" d=\"M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z\" clipRule=\"evenodd\" />\n              </svg>\n            </div>\n            <span className=\"text-xl font-bold font-brand tracking-tight text-rose-600\">مساعد الأم</span>\n          </div>\n          <nav className=\"hidden sm:flex items-center space-x-6 space-x-reverse\">\n            <a href=\"#\" className=\"text-sm font-medium text-slate-600 hover:text-rose-500 transition-colors\">نصائح السلامة</a>\n            <a href=\"#\" className=\"text-sm font-medium text-slate-600 hover:text-rose-500 transition-colors\">من نحن</a>\n          </nav>\n        </div>\n      </header>\n\n      <main className=\"flex-grow\">\n        {children}\n      </main>\n\n      <footer className=\"bg-white border-t border-slate-200 py-8 mt-12\">\n        <div className=\"max-w-4xl mx-auto px-4 text-center\">\n          <p className=\"text-slate-500 text-sm\">\n            &copy; {new Date().getFullYear()} مساعد الأم. جميع الحقوق محفوظة.\n          </p>\n          <p className=\"text-slate-400 text-xs mt-2 leading-relaxed\">\n            تنبيه: توفر هذه الأداة المدعومة بالذكاء الاصطناعي إرشادات عامة وليست بديلاً عن النصائح الطبية المهنية أو التشخيص أو العلاج. اطلبي دائماً مشورة طبيبك أو غيره من مقدمي الخدمات الصحية المؤهلين.\n          </p>\n        </div>\n      </footer>\n    </div>\n  );\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "components/AdviceDisplay.tsx",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Translate advice display and labels to Arabic.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React from 'react';\nimport { ChildAdvice } from '../types';\n\ninterface AdviceDisplayProps {\n  advice: ChildAdvice;\n  onReset: () => void;\n}\n\nexport const AdviceDisplay: React.FC<AdviceDisplayProps> = ({ advice, onReset }) => {\n  return (\n    <div className=\"space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500\">\n      <div className=\"bg-rose-50 border border-rose-100 rounded-2xl p-6 sm:p-8\">\n        <h2 className=\"text-2xl font-bold font-brand text-rose-800 mb-4\">نصائح من أجل صغيركِ</h2>\n        <p className=\"text-rose-900/80 leading-relaxed mb-6 italic\">\"{advice.summary}\"</p>\n        \n        <div className=\"grid grid-cols-1 md:grid-cols-2 gap-6\">\n          <section className=\"bg-white rounded-xl p-5 shadow-sm border border-rose-100\">\n            <h3 className=\"text-lg font-bold text-rose-700 flex items-center mb-3\">\n              <span className=\"bg-rose-100 p-1.5 rounded-lg ml-2\">🚀</span>\n              خطوات فورية\n            </h3>\n            <ul className=\"space-y-2\">\n              {advice.immediateSteps.map((step, i) => (\n                <li key={i} className=\"flex items-start text-slate-700 text-sm\">\n                  <span className=\"text-rose-400 ml-2\">•</span>\n                  {step}\n                </li>\n              ))}\n            </ul>\n          </section>\n\n          <section className=\"bg-white rounded-xl p-5 shadow-sm border border-rose-100\">\n            <h3 className=\"text-lg font-bold text-rose-700 flex items-center mb-3\">\n              <span className=\"bg-rose-100 p-1.5 rounded-lg ml-2\">🌱</span>\n              استراتيجيات التعامل\n            </h3>\n            <ul className=\"space-y-2\">\n              {advice.managementStrategies.map((strategy, i) => (\n                <li key={i} className=\"flex items-start text-slate-700 text-sm\">\n                  <span className=\"text-rose-400 ml-2\">•</span>\n                  {strategy}\n                </li>\n              ))}\n            </ul>\n          </section>\n        </div>\n\n        <div className=\"mt-6 space-y-6\">\n          <section className=\"bg-indigo-50 rounded-xl p-5 border border-indigo-100\">\n            <h3 className=\"text-lg font-bold text-indigo-700 flex items-center mb-3\">\n              <span className=\"bg-indigo-100 p-1.5 rounded-lg ml-2\">💡</span>\n              نصائح الخبراء\n            </h3>\n            <ul className=\"grid grid-cols-1 sm:grid-cols-2 gap-3\">\n              {advice.expertTips.map((tip, i) => (\n                <li key={i} className=\"flex items-center text-indigo-900 text-sm font-medium\">\n                  <svg className=\"w-4 h-4 ml-2 text-indigo-400 shrink-0 transform rotate-180\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n                    <path fillRule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z\" clipRule=\"evenodd\" />\n                  </svg>\n                  {tip}\n                </li>\n              ))}\n            </ul>\n          </section>\n\n          <section className=\"bg-amber-50 rounded-xl p-5 border border-amber-200\">\n            <h3 className=\"text-lg font-bold text-amber-700 flex items-center mb-3\">\n              <span className=\"bg-amber-100 p-1.5 rounded-lg ml-2\">⚠️</span>\n              متى يجب زيارة الطبيب\n            </h3>\n            <ul className=\"space-y-2\">\n              {advice.warningSigns.map((sign, i) => (\n                <li key={i} className=\"flex items-start text-amber-900 text-sm font-semibold\">\n                  <span className=\"text-amber-500 ml-2\">•</span>\n                  {sign}\n                </li>\n              ))}\n            </ul>\n          </section>\n        </div>\n\n        <button\n          onClick={onReset}\n          className=\"mt-8 w-full bg-rose-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-rose-200 hover:bg-rose-700 transition-all active:scale-95\"\n        >\n          طرح سؤال آخر\n        </button>\n      </div>\n    </div>\n  );\n};\n"
+            }
+          ]
+        },
+        {
+          "path": "App.tsx",
+          "generationType": 1,
+          "isDone": true,
+          "description": "Translate the entire main page content and form to Arabic.",
+          "diffs": [
+            {
+              "target": "",
+              "replacement": "\nimport React, { useState } from 'react';\nimport { Layout } from './components/Layout';\nimport { AdviceDisplay } from './components/AdviceDisplay';\nimport { getChildAdvice } from './services/geminiService';\nimport { ChildAdvice, ConsultationData, LoadingState } from './types';\n\nexport default function App() {\n  const [formData, setFormData] = useState<ConsultationData>({\n    age: '',\n    ageUnit: 'years',\n    problem: ''\n  });\n  const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.IDLE);\n  const [advice, setAdvice] = useState<ChildAdvice | null>(null);\n  const [error, setError] = useState<string | null>(null);\n\n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault();\n    if (!formData.age || !formData.problem) return;\n\n    setLoadingState(LoadingState.LOADING);\n    setError(null);\n    \n    try {\n      const result = await getChildAdvice(formData);\n      setAdvice(result);\n      setLoadingState(LoadingState.SUCCESS);\n    } catch (err) {\n      console.error(err);\n      setError(\"عذراً، لم أتمكن من معالجة طلبكِ. يرجى المحاولة مرة أخرى أو إعادة صياغة مشكلتكِ.\");\n      setLoadingState(LoadingState.ERROR);\n    }\n  };\n\n  const handleReset = () => {\n    setAdvice(null);\n    setLoadingState(LoadingState.IDLE);\n    setFormData({ age: '', ageUnit: 'years', problem: '' });\n  };\n\n  return (\n    <Layout>\n      <div className=\"max-w-4xl mx-auto px-4 py-8 sm:py-12\">\n        <div className=\"text-center mb-10\">\n          <h1 className=\"text-4xl font-extrabold text-slate-900 mb-4 font-brand\">كيف يمكننا مساعدتكِ اليوم؟</h1>\n          <p className=\"text-lg text-slate-600 max-w-2xl mx-auto\">\n            احصلي على نصائح مخصصة وطرق علاج تتناسب مع عمر طفلكِ والمشاكل التي يواجهها.\n          </p>\n        </div>\n\n        {loadingState !== LoadingState.SUCCESS ? (\n          <div className=\"bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transition-all duration-300\">\n            <div className=\"p-6 sm:p-10\">\n              <form onSubmit={handleSubmit} className=\"space-y-6\">\n                <div className=\"grid grid-cols-1 sm:grid-cols-2 gap-6\">\n                  <div>\n                    <label className=\"block text-sm font-semibold text-slate-700 mb-2\">عمر الطفل</label>\n                    <div className=\"flex space-x-2 space-x-reverse\">\n                      <input\n                        type=\"number\"\n                        required\n                        min=\"0\"\n                        value={formData.age}\n                        onChange={(e) => setFormData(p => ({ ...p, age: e.target.value }))}\n                        className=\"flex-grow px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all outline-none\"\n                        placeholder=\"مثال: 3\"\n                      />\n                      <select\n                        value={formData.ageUnit}\n                        onChange={(e) => setFormData(p => ({ ...p, ageUnit: e.target.value as any }))}\n                        className=\"px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all outline-none bg-slate-50 font-medium\"\n                      >\n                        <option value=\"days\">أيام</option>\n                        <option value=\"months\">أشهر</option>\n                        <option value=\"years\">سنوات</option>\n                      </select>\n                    </div>\n                  </div>\n                  <div className=\"hidden sm:block\">\n                    <div className=\"h-full bg-rose-50 rounded-2xl flex items-center p-4 border border-rose-100\">\n                      <p className=\"text-xs text-rose-700 leading-relaxed\">\n                        تحديد العمر بدقة أمر حيوي لأن مراحل التطور تتغير بسرعة كبيرة في مرحلة الطفولة المبكرة.\n                      </p>\n                    </div>\n                  </div>\n                </div>\n\n                <div>\n                  <label className=\"block text-sm font-semibold text-slate-700 mb-2\">ما هي المشكلة أو القلق الذي يواجهك؟</label>\n                  <textarea\n                    required\n                    rows={4}\n                    value={formData.problem}\n                    onChange={(e) => setFormData(p => ({ ...p, problem: e.target.value }))}\n                    className=\"w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all outline-none resize-none\"\n                    placeholder=\"صفي الأعراض، السلوك، أو أي أسئلة لديكِ... (مثلاً: رفض الأكل، حرارة، عادات النوم)\"\n                  />\n                </div>\n\n                {error && (\n                  <div className=\"p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm font-medium\">\n                    {error}\n                  </div>\n                )}\n\n                <button\n                  type=\"submit\"\n                  disabled={loadingState === LoadingState.LOADING}\n                  className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center space-x-2 space-x-reverse\n                    ${loadingState === LoadingState.LOADING \n                      ? 'bg-slate-300 cursor-not-allowed' \n                      : 'bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.98] shadow-rose-200 hover:shadow-rose-300'\n                    }`}\n                >\n                  {loadingState === LoadingState.LOADING ? (\n                    <>\n                      <svg className=\"animate-spin h-5 w-5 ml-3\" viewBox=\"0 0 24 24\">\n                        <circle className=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"4\" fill=\"none\"></circle>\n                        <path className=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z\"></path>\n                      </svg>\n                      <span>جاري استشارة الأخصائيين...</span>\n                    </>\n                  ) : (\n                    <span>احصلي على نصيحة الخبراء</span>\n                  )}\n                </button>\n              </form>\n            </div>\n          </div>\n        ) : (\n          advice && <AdviceDisplay advice={advice} onReset={handleReset} />\n        )}\n\n        <div className=\"mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8\">\n          <div className=\"text-center\">\n            <div className=\"w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-xl font-bold\">١</div>\n            <h4 className=\"font-bold text-slate-800 mb-1\">إدخال التفاصيل</h4>\n            <p className=\"text-sm text-slate-500\">حددي العمر وتفاصيل المشكلة الحالية.</p>\n          </div>\n          <div className=\"text-center\">\n            <div className=\"w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 text-xl font-bold\">٢</div>\n            <h4 className=\"font-bold text-slate-800 mb-1\">تحليل الذكاء الاصطناعي</h4>\n            <p className=\"text-sm text-slate-500\">يقوم نموذجنا بمراجعة الإرشادات التربوية والطبية.</p>\n          </div>\n          <div className=\"text-center\">\n            <div className=\"w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600 text-xl font-bold\">٣</div>\n            <h4 className=\"font-bold text-slate-800 mb-1\">تلقي الإرشادات</h4>\n            <p className=\"text-sm text-slate-500\">احصلي على خطوات عملية وطرق للتعامل مع الحالة.</p>\n          </div>\n        </div>\n      </div>\n    </Layout>\n  );\n}\n"
+            }
+          ]
+        }
+      ]
+    },
+    "createdTimestamp": {
+      "seconds": 1770231644,
+      "nanos": 386000000
+    },
+    "doneTimestamp": {
+      "seconds": 1770231646,
+      "nanos": 571000000
+    }
+  }
+]
